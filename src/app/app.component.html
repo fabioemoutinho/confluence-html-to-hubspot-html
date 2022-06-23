@@ -1,0 +1,15 @@
+<ng-container [formGroup]="form">
+  <mat-form-field>
+    <mat-label>Input</mat-label>
+    <textarea matInput formControlName="input" rows="10"></textarea>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Output</mat-label>
+    <textarea matInput formControlName="output" rows="10"></textarea>
+  </mat-form-field>
+</ng-container>
+
+<button [cdkCopyToClipboard]="form.controls.output.value!">
+  Copy output to clipboard
+</button>
