@@ -4,6 +4,7 @@ import { tap } from 'rxjs';
 
 enum LANGUAGES {
   java = 'javascript',
+  html = 'html',
 }
 
 @Component({
