@@ -32,16 +32,26 @@ export class AppComponent implements OnInit {
   }
 
   clearHtml(htmlString: string): string {
-    return htmlString
-      .replace(/<\/?span[^>]*>/g, '') // remove span, but keep content
-      .replace(
-        /<\s*pre.*?data-syntaxhighlighter-params=\"brush: (.*?); [^"]*\".*?>/g,
-        (match, p1: keyof typeof LANGUAGES) => {
-          const language: string = this.languages[p1] ?? 'javascript';
-          return `<pre class="language-${language}">`;
-        }
-      ) // replace attributes inside <pre>
-      .replace(/(<pre.*?>)([^]*?)(<\/pre>)/g, '$1<code>$2</code>$3') // wrap content inside <pre> with <code>
-      .replace(/<\/?div[^>]*>/g, ''); // remove div, but keep content
+    return (
+      htmlString
+        // remove span, but keep content
+        .replace(/<\/?span[^>]*>/g, '')
+        // replace attributes inside <pre>
+        .replace(
+          /<\s*pre.*?data-syntaxhighlighter-params=\"brush: (.*?); [^"]*\".*?>/g,
+          (match, p1: keyof typeof LANGUAGES) => {
+            const language: string = this.languages[p1] ?? 'javascript';
+            return `<pre class="language-${language}">`;
+          }
+        )
+        // wrap content inside <pre> with <code>
+        // and wrap code content with {% raw %} to prevent HubSpot from evaluating HubL Syntax https://developers.hubspot.com/docs/cms/hubl
+        .replace(
+          /(<pre.*?>)([^]*?)(<\/pre>)/g,
+          '$1<code>{% raw %}$2{% endraw %}</code>$3'
+        )
+        // remove div, but keep content
+        .replace(/<\/?div[^>]*>/g, '')
+    );
   }
 }
