@@ -45,11 +45,10 @@ export class AppComponent implements OnInit {
           }
         )
         // wrap content inside <pre> with <code>
-        // and wrap code content with {% raw %} to prevent HubSpot from evaluating HubL Syntax https://developers.hubspot.com/docs/cms/hubl
-        .replace(
-          /(<pre.*?>)([^]*?)(<\/pre>)/g,
-          '$1<code>{% raw %}$2{% endraw %}</code>$3'
-        )
+        .replace(/(<pre.*?>)([^]*?)(<\/pre>)/g, '$1<code>$2</code>$3')
+        // prevent HubSpot from evaluating HubL Syntax https://developers.hubspot.com/docs/cms/hubl
+        .replace(/{%([^]*?)%}/g, '{% raw %}{%$1%}{% endraw %}')
+        .replace(/{{([^]*?)}}/g, '{% raw %}{{$1}}{% endraw %}')
         // remove div, but keep content
         .replace(/<\/?div[^>]*>/g, '')
     );
