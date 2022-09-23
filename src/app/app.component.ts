@@ -7,6 +7,12 @@ enum LANGUAGES {
   html = 'html',
 }
 
+enum PANEL_CLASSES {
+  information = 'info',
+  note = 'warn',
+  warning = 'error',
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -18,6 +24,7 @@ export class AppComponent implements OnInit {
     output: [''],
   });
   private readonly languages = LANGUAGES;
+  private readonly panelClasses = PANEL_CLASSES;
 
   constructor(private fb: FormBuilder) {}
 
@@ -49,8 +56,26 @@ export class AppComponent implements OnInit {
         // prevent HubSpot from evaluating HubL Syntax https://developers.hubspot.com/docs/cms/hubl
         .replace(/{%([^]*?)%}/g, '{% raw %}{%$1%}{% endraw %}')
         .replace(/{{([^]*?)}}/g, '{% raw %}{{$1}}{% endraw %}')
+        // remove info/warn/error block body div
+        .replace(
+          /<div class="confluence-information-macro-body">([^]*?)<\/div>/g,
+          '$1'
+        )
+        // replace info/warn/error block container div with keep tag before removing all divs
+        .replace(
+          /<div class="confluence-information-macro confluence-information-macro-(.*?)">([^]*?)<\/div>/g,
+          (match, p1: keyof typeof PANEL_CLASSES, p2: string) => {
+            const panelClass: string = this.panelClasses[p1] ?? 'info';
+            return `<keep class="panel-${panelClass}">${p2}</keep>`;
+          }
+        )
         // remove div, but keep content
         .replace(/<\/?div[^>]*>/g, '')
+        // replace <keep> with <div>
+        .replace(
+          /<keep class="(.*?)">([^]*?)<\/keep>/g,
+          '<div class="$1">$2</div>'
+        )
     );
   }
 }
